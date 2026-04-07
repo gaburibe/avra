@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avra — Vulcano</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --avra-bg: #f0f2f5;
+      --avra-bg2: #e8eaf0;
+      --avra-lavanda: #b8b8d4;
+      --avra-lavanda-dark: #8888b0;
+      --avra-sage: #a8bfb0;
+      --avra-sage-dark: #6a9080;
+      --avra-ink: #1a1a2e;
+      --avra-ink-soft: #3a3a5a;
+      --avra-ink-muted: #7a7a9a;
+      --avra-border-outer: #d0d2e0;
+      --avra-border-inner: #b8b8d4;
+    }
+
+    body {
+      background: var(--avra-bg);
+      color: var(--avra-ink);
+      font-family: Georgia, serif;
+      padding: 1.5rem;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .avra-panel {
+      border: 1px solid var(--avra-border-outer);
+      outline: 3px solid var(--avra-border-inner);
+      outline-offset: -6px;
+      border-radius: 2px;
+      background: var(--avra-bg);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .avra-panel-sage {
+      border-color: var(--avra-sage-dark);
+      outline-color: var(--avra-sage);
+    }
+
+    .avra-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 1.5rem;
+    }
+
+    .avra-avatar {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--avra-lavanda-dark);
+      outline: 2px solid var(--avra-lavanda);
+      outline-offset: -4px;
+      border-radius: 2px;
+      background: var(--avra-bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--avra-ink-soft);
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+
+    .avra-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--avra-ink);
+      letter-spacing: 0.5px;
+    }
+
+    .avra-sub {
+      font-size: 11px;
+      color: var(--avra-ink-muted);
+      margin-top: 3px;
+      letter-spacing: 1px;
+    }
+
+    .avra-wordmark {
+      margin-left: auto;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--avra-lavanda-dark);
+      font-weight: 500;
+    }
+
+    .avra-video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--avra-ink);
+      border: 1px solid var(--avra-border-outer);
+      outline: 3px solid var(--avra-lavanda);
+      outline-offset: -6px;
+      margin-bottom: 1.25rem;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .avra-video iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: none;
+    }
+
+    .avra-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--avra-ink-muted);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--avra-border-outer);
+      font-family: Georgia, serif;
+    }
+
+    .avra-echo {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--avra-border-outer);
+    }
+
+    .avra-echo:last-child { border-bottom: none; }
+
+    .avra-echo-text {
+      font-size: 13px;
+      color: var(--avra-ink-soft);
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .avra-echo-author {
+      font-size: 10px;
+      color: var(--avra-ink-muted);
+      margin-top: 5px;
+      letter-spacing: 1px;
+    }
+
+    .avra-chat {
+      min-height: 180px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 1rem;
+    }
+
+    .avra-msg { max-width: 88%; }
+    .avra-msg-julia { align-self: flex-start; }
+    .avra-msg-user { align-self: flex-end; }
+
+    .avra-msg-name {
+      font-size: 10px;
+      color: var(--avra-ink-muted);
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      padding: 0 2px;
+      font-family: Georgia, serif;
+    }
+
+    .avra-msg-julia .avra-msg-name { text-align: left; }
+    .avra-msg-user .avra-msg-name { text-align: right; }
+
+    .avra-bubble {
+      padding: 10px 14px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--avra-ink);
+      border-radius: 2px;
+    }
+
+    .avra-msg-julia .avra-bubble {
+      background: var(--avra-bg2);
+      border: 1px solid var(--avra-border-outer);
+      outline: 2px solid var(--avra-lavanda);
+      outline-offset: -5px;
+    }
+
+    .avra-msg-user .avra-bubble {
+      background: var(--avra-bg);
+      border: 1px solid var(--avra-sage-dark);
+      outline: 2px solid var(--avra-sage);
+      outline-offset: -5px;
+    }
+
+    .avra-save {
+      font-size: 10px;
+      color: var(--avra-lavanda-dark);
+      cursor: pointer;
+      letter-spacing: 1px;
+      margin-top: 5px;
+      display: inline-block;
+      padding: 0 2px;
+      border-bottom: 1px solid var(--avra-lavanda);
+      font-family: Georgia, serif;
+    }
+
+    .avra-save:hover { color: var(--avra-ink-soft); }
+
+    .avra-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .avra-input-row textarea {
+      flex: 1;
+      resize: none;
+      min-height: 40px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-family: Georgia, serif;
+      background: var(--avra-bg2);
+      color: var(--avra-ink);
+      border: 1px solid var(--avra-border-outer);
+      outline: 2px solid var(--avra-border-inner);
+      outline-offset: -5px;
+      border-radius: 2px;
+      line-height: 1.5;
+    }
+
+    .avra-input-row textarea:focus {
+      outline-color: var(--avra-lavanda-dark);
+      border-color: var(--avra-lavanda-dark);
+    }
+
+    .avra-btn {
+      height: 40px;
+      padding: 0 16px;
+      background: var(--avra-bg2);
+      color: var(--avra-ink-soft);
+      border: 1px solid var(--avra-lavanda-dark);
+      outline: 2px solid var(--avra-lavanda);
+      outline-offset: -5px;
+      border-radius: 2px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-family: Georgia, serif;
+    }
+
+    .avra-btn:hover { background: var(--avra-lavanda); color: var(--avra-ink); }
+    .avra-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .avra-typing {
+      font-size: 11px;
+      color: var(--avra-ink-muted);
+      letter-spacing: 1px;
+      min-height: 18px;
+      margin-bottom: 6px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="avra-header">
+    <div class="avra-avatar">JOS</div>
+    <div>
+      <div class="avra-name">Julia Orion Smith</div>
+      <div class="avra-sub">VULCANO — JUNGLE, 2023</div>
+    </div>
+    <div class="avra-wordmark">AVRA</div>
+  </div>
+
+  <div class="avra-video">
+    <video controls style="width:100%; height:100%; display:block;">
+  <source src="/resources/volcano.mp4" type="video/mp4">
+</video>
+  </div>
+
+  <div class="avra-panel avra-panel-sage">
+    <div class="avra-label">VOCES ANTERIORES</div>
+    <div id="echoes-list">
+      <div class="avra-echo">
+        <div class="avra-echo-text">"El final de Vulcano es demasiado optimista. Cuando se cierra el telón todavía hay cosas que hacer."</div>
+        <div class="avra-echo-author">— Gabriel, Ciudad de México</div>
+      </div>
+      <div class="avra-echo">
+        <div class="avra-echo-text">"Es la historia de una generación y la de sus padres. Los mayores estóicos observando la jungla."</div>
+        <div class="avra-echo-author">— Gabriel, Ciudad de México</div>
+      </div>
+      <div class="avra-echo">
+        <div class="avra-echo-text">"No es que nos pudiéramos esconder. Todo era exceso, incluso el romance."</div>
+        <div class="avra-echo-author">— Gabriel, Ciudad de México</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="avra-panel">
+    <div class="avra-label">CONVERSACIÓN</div>
+    <div class="avra-chat" id="chat">
+      <div class="avra-msg avra-msg-julia">
+        <div class="avra-msg-name">JULIA</div>
+        <div class="avra-bubble">Buenos días. ¿Qué te dejó Vulcano?</div>
+      </div>
+    </div>
+    <div class="avra-typing" id="typing"></div>
+    <div class="avra-input-row">
+      <textarea id="input" placeholder="escribe algo..." rows="1"></textarea>
+      <button class="avra-btn" id="send-btn">enviar</button>
+    </div>
+  </div>
+
+  <script>
+    let history = [];
+
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const btn = document.getElementById('send-btn');
+    const typing = document.getElementById('typing');
+
+    async function loadVoces() {
+      try {
+        const res = await fetch('/voces?obra=vulcano');
+        const voces = await res.json();
+        if (voces.length > 0) {
+          const list = document.getElementById('echoes-list');
+          list.innerHTML = '';
+          voces.forEach(v => {
+            const echo = document.createElement('div');
+            echo.className = 'avra-echo';
+            echo.innerHTML = `<div class="avra-echo-text">"${v.texto}"</div><div class="avra-echo-author">— ${v.autor}</div>`;
+            list.appendChild(echo);
+          });
+        }
+      } catch(e) {}
+    }
+
+    function addMsg(role, text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'avra-msg avra-msg-' + (role === 'assistant' ? 'julia' : 'user');
+      const name = document.createElement('div');
+      name.className = 'avra-msg-name';
+      name.textContent = role === 'assistant' ? 'JULIA' : 'TÚ';
+      const bubble = document.createElement('div');
+      bubble.className = 'avra-bubble';
+      bubble.textContent = text;
+      wrap.appendChild(name);
+      wrap.appendChild(bubble);
+      if (role === 'user') {
+        const save = document.createElement('span');
+        save.className = 'avra-save';
+        save.textContent = 'guardar voz';
+        save.onclick = () => saveVoz(text);
+        wrap.appendChild(save);
+      }
+      chat.appendChild(wrap);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function saveVoz(texto) {
+      const autor = prompt('¿Cómo quieres aparecer? (nombre o ciudad)') || 'anónimo';
+      await fetch('/voces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto, autor, obra: 'vulcano' })
+      });
+      loadVoces();
+    }
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    });
+
+    async function send() {
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      btn.disabled = true;
+      addMsg('user', text);
+      history.push({ role: 'user', content: text });
+      typing.textContent = 'julia está escribiendo...';
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history })
+        });
+        const data = await res.json();
+        history.push({ role: 'assistant', content: data.reply });
+        typing.textContent = '';
+        addMsg('assistant', data.reply);
+      } catch(e) {
+        typing.textContent = '';
+        addMsg('assistant', 'Perdón, algo salió mal.');
+      }
+      btn.disabled = false;
+      input.focus();
+    }
+
+    btn.addEventListener('click', send);
+    loadVoces();
+  </script>
+
+</body>
+</html>
