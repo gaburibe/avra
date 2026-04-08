@@ -54,7 +54,7 @@ def chat():
     
     conn = sqlite3.connect('voces.db')
     c = conn.cursor()
-    c.execute('SELECT texto, autor FROM voces WHERE obra = ? ORDER BY RANDOM() LIMIT 10', (obra,))
+    c.execute('SELECT texto, autor FROM voces WHERE obra = ? ORDER BY fecha DESC LIMIT 10', (obra,))
     voces_db = c.fetchall()
     conn.close()
     
