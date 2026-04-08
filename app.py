@@ -50,24 +50,11 @@ def resources(filename):
 def chat():
     data = request.json
     messages = data.get('messages', [])
-    obra = data.get('obra', 'vulcano')
-    
-    conn = sqlite3.connect('voces.db')
-    c = conn.cursor()
-    c.execute('SELECT texto, autor FROM voces WHERE obra = ? ORDER BY fecha DESC LIMIT 10', (obra,))
-    voces_db = c.fetchall()
-    conn.close()
-    
-    voces_texto = '\n'.join([f'— "{v[0]}" — {v[1]}' for v in voces_db]) if voces_db else ''
-    
-    system_dinamico = SYSTEM_PROMPT
-    if voces_texto:
-        system_dinamico += f'\n\nVoces recientes que también has escuchado:\n{voces_texto}'
     
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=1000,
-        system=system_dinamico,
+        system=SYSTEM_PROMPT,
         messages=messages
     )
     
