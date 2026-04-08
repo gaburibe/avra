@@ -27,7 +27,7 @@ Voces que ya escuchaste sobre esta obra:
 Puedes referenciar estas voces naturalmente si vienen al caso. Responde siempre en español. Sé breve — una o dos ideas por respuesta. Eres observadora, no catedrática."""
 
 def init_db():
-    conn = sqlite3.connect('voces.db')
+    conn = sqlite3.connect(os.environ.get('DATABASE_URL', 'voces.db'))
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS voces
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,11 +50,24 @@ def resources(filename):
 def chat():
     data = request.json
     messages = data.get('messages', [])
+    obra = data.get('obra', 'vulcano')
+    
+    conn = sqlite3.connect(os.environ.get('DATABASE_URL', 'voces.db'))
+    c = conn.cursor()
+    c.execute('SELECT texto, autor FROM voces WHERE obra = ? ORDER BY RANDOM() LIMIT 10', (obra,))
+    voces_db = c.fetchall()
+    conn.close()
+    
+    voces_texto = '\n'.join([f'— "{v[0]}" — {v[1]}' for v in voces_db]) if voces_db else ''
+    
+    system_dinamico = SYSTEM_PROMPT
+    if voces_texto:
+        system_dinamico += f'\n\nVoces recientes que también has escuchado:\n{voces_texto}'
     
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=1000,
-        system=SYSTEM_PROMPT,
+        system=system_dinamico,
         messages=messages
     )
     
@@ -64,7 +77,7 @@ def chat():
 @app.route('/voces', methods=['GET'])
 def get_voces():
     obra = request.args.get('obra', 'vulcano')
-    conn = sqlite3.connect('voces.db')
+    conn = sqlite3.connect(os.environ.get('DATABASE_URL', 'voces.db'))
     c = conn.cursor()
     c.execute('SELECT texto, autor, fecha FROM voces WHERE obra = ? ORDER BY fecha DESC LIMIT 10', (obra,))
     voces = [{'texto': r[0], 'autor': r[1], 'fecha': r[2]} for r in c.fetchall()]
@@ -74,7 +87,7 @@ def get_voces():
 @app.route('/voces', methods=['POST'])
 def save_voz():
     data = request.json
-    conn = sqlite3.connect('voces.db')
+    conn = sqlite3.connect(os.environ.get('DATABASE_URL', 'voces.db'))
     c = conn.cursor()
     c.execute('INSERT INTO voces (texto, autor, obra) VALUES (?, ?, ?)',
               (data.get('texto'), data.get('autor', 'anónimo'), data.get('obra', 'vulcano')))

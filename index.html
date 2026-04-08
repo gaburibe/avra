@@ -322,15 +322,17 @@
       try {
         const res = await fetch('/voces?obra=vulcano');
         const voces = await res.json();
+        const list = document.getElementById('echoes-list');
+        list.innerHTML = '';
         if (voces.length > 0) {
-          const list = document.getElementById('echoes-list');
-          list.innerHTML = '';
           voces.forEach(v => {
             const echo = document.createElement('div');
             echo.className = 'avra-echo';
             echo.innerHTML = `<div class="avra-echo-text">"${v.texto}"</div><div class="avra-echo-author">— ${v.autor}</div>`;
             list.appendChild(echo);
           });
+        } else {
+          list.innerHTML = '<div class="avra-echo"><div class="avra-echo-text">Aún no hay voces. Sé el primero.</div></div>';
         }
       } catch(e) {}
     }
@@ -384,7 +386,7 @@
         const res = await fetch('/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history })
+          body: JSON.stringify({ messages: history, obra: 'vulcano' })
         });
         const data = await res.json();
         history.push({ role: 'assistant', content: data.reply });
